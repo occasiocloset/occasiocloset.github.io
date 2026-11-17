@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3ECE1">
+<meta name="description" content="Tu armario en el móvil, el de tus amigas y tus looks en el calendario.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Occasio">
+<title>Occasio · Tu armario, mil looks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Lora:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<div class="marco" id="marco">
+  <div class="app" id="app">
+    <main class="vista" id="vista" aria-live="polite"></main>
+
+    <nav class="tabbar" aria-label="Secciones">
+      <button class="tab" data-a="tab" data-t="hoy" aria-current="page"><span data-ico="hoy"></span>Hoy</button>
+      <button class="tab" data-a="tab" data-t="armario"><span data-ico="armario"></span>Armario</button>
+      <button class="tab-mas" data-a="mas" aria-label="Añadir prendas, crear o publicar un look"><span data-ico="mas"></span></button>
+      <button class="tab" data-a="tab" data-t="calendario"><span data-ico="calendario"></span>Calendario</button>
+      <button class="tab" data-a="tab" data-t="perfil"><span data-ico="perfil"></span>Perfil</button>
+    </nav>
+
+    <div class="capas" id="capas"></div>
+    <div class="noti" id="noti" role="status" aria-live="polite"></div>
+    <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+    <div class="carga" id="carga" role="status"><span class="girar" aria-hidden="true"></span><b>occasio</b><p id="carga-txt">Cargando…</p></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="ilustraciones.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
