@@ -10,5 +10,5 @@ window.OCCASIO_CONFIG = {
 
   // Dirección pública de la web (para enlaces de invitación y correos).
   // Vacío = la dirección desde la que se abre la página.
-  urlPublica: 'https://vicentemenarguess-hue.github.io/occasio/'
+  urlPublica: 'https://occasiocloset.github.io/'
 };
