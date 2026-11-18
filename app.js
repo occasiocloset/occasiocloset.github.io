@@ -188,7 +188,7 @@ function avatar(id, cls = '') {
 }
 function sticker(p, o = {}) {
   const f = urlFoto(p.foto_path);
-  const media = f ? `<img src="${esc(f)}" alt="${esc(p.nombre)}" loading="lazy">` : svgPrenda(FORMA_TIPO[p.tipo], p.color, null, p.nombre);
+  const media = f ? `<img ${esCatalogo(p.foto_path) ? 'class="entera" ' : ''}src="${esc(f)}" alt="${esc(p.nombre)}" loading="lazy">` : svgPrenda(FORMA_TIPO[p.tipo], p.color, null, p.nombre);
   const badge = o.duena && p.duena !== (o.autora || UID()) ? `<span class="duena">${avatar(p.duena, 's')}</span>` : '';
   return `<span class="st">${media}${o.extra || ''}${badge}</span>`;
 }
@@ -829,7 +829,7 @@ function abrirCatalogo(desdeOnb) {
       <div class="sel-grid cat-grid">${lst.map(it => {
         const ya = enArmario(it), on = el._sel.has(it.id);
         return `<div class="pr cat-item ${ya ? 'ya' : ''} ${on ? 'on' : ''}">
-          <span class="st"><button class="cat-ver" data-a="cat-ver" data-id="${it.id}" aria-label="Ver en grande: ${esc(it.nombre)}"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}" loading="lazy"></button>
+          <span class="st"><button class="cat-ver" data-a="cat-ver" data-id="${it.id}" aria-label="Ver en grande: ${esc(it.nombre)}"><img class="entera" src="${esc(it.foto)}" alt="${esc(it.nombre)}" loading="lazy"></button>
             ${ya ? '' : `<button class="cat-check" data-a="cat-sel" data-id="${it.id}" aria-pressed="${on}" aria-label="Lo tengo: ${esc(it.nombre)}">${icono('ok', 16)}</button>`}</span>
           <button class="cat-txt" data-a="cat-sel" data-id="${it.id}" ${ya ? 'disabled' : ''} aria-pressed="${on}"><span class="pr-nom">${esc(it.nombre)}</span><span class="pr-sub">${ya ? 'Ya en tu armario' : on ? 'Lo tengo ✓' : TIPO_TXT[it.tipo]}</span></button></div>`;
       }).join('')}</div>
@@ -846,7 +846,7 @@ function abrirZoomCatalogo(capaCat, id) {
     const it = CATALOGO.find(x => x.id === ids[el._i]); if (!it) return '';
     const ya = enArmario(it), on = capaCat._sel.has(it.id), n = ids.length;
     return `<button class="ib zoom-x" data-a="cerrar" aria-label="Cerrar">${icono('cerrar')}</button>
-      <div class="zoom-foto"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}">
+      <div class="zoom-foto"><img class="entera" src="${esc(it.foto)}" alt="${esc(it.nombre)}">
         ${n > 1 ? `<button class="zoom-nav izq" data-a="zoom-nav" data-d="-1" aria-label="Prenda anterior">${icono('izq')}</button><button class="zoom-nav der" data-a="zoom-nav" data-d="1" aria-label="Prenda siguiente">${icono('der')}</button>` : ''}</div>
       <div class="zoom-pie"><div><p class="voz zoom-nom">${esc(it.nombre)}</p><p class="sub">${TIPO_TXT[it.tipo]} · ${cap(colorTxt(it.color, FEM_TIPO[it.tipo]))} · ${TEMP_TXT[it.temporada] || 'Todo el año'}</p></div>
         <span class="zoom-num" aria-hidden="true">${el._i + 1}/${n}</span></div>
