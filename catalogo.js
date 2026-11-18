@@ -68,15 +68,6 @@ window.OCCASIO_CATALOGO = [
   "descripcion": "Jersey de punto calentito en tono crema. Un básico de invierno que ilumina el look y va con casi todo."
  },
  {
-  "id": "cardigan-beige",
-  "nombre": "Cárdigan beige",
-  "tipo": "arriba",
-  "color": "beige",
-  "temporada": "entretiempo",
-  "foto": "catalogo/cardigan-beige.jpg",
-  "descripcion": "Chaqueta de punto con botones en beige. Se lleva abierta sobre una camiseta o abrochada como jersey."
- },
- {
   "id": "cardigan-rojo",
   "nombre": "Cárdigan rojo",
   "tipo": "arriba",
@@ -215,7 +206,7 @@ window.OCCASIO_CATALOGO = [
   "id": "cazadora",
   "nombre": "Cazadora oscura",
   "tipo": "abrigo",
-  "color": "azul",
+  "color": "negro",
   "temporada": "entretiempo",
   "foto": "catalogo/cazadora.jpg",
   "descripcion": "Cazadora corta en tono oscuro. Para entretiempo, encima de vestidos, faldas o con vaqueros."
