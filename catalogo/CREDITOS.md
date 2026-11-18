@@ -1,0 +1,44 @@
+# Fotos del catálogo de básicos
+
+Todas proceden de Pexels y se usan con su licencia (https://www.pexels.com/license/): uso gratuito, también comercial, sin atribución obligatoria. Aun así, aquí queda el origen de cada una.
+
+- Camiseta blanca: https://www.pexels.com/photo/12039633/
+- Camiseta negra: https://www.pexels.com/photo/8532616/
+- Camisa de rayas: https://www.pexels.com/photo/7444126/
+- Camisa blanca: https://www.pexels.com/photo/28576622/
+- Camisa gris: https://www.pexels.com/photo/13381986/
+- Jersey de rayas marinero: https://www.pexels.com/photo/45982/
+- Jersey de punto crema: https://www.pexels.com/photo/13889763/
+- Cárdigan beige: https://www.pexels.com/photo/14641438/
+- Cárdigan rojo: https://www.pexels.com/photo/36129313/
+- Jersey de punto rojo: https://www.pexels.com/photo/12944791/
+- Blusa blanca: https://www.pexels.com/photo/17305436/
+- Top blanco de tirantes: https://www.pexels.com/photo/1107604/
+- Sudadera beige: https://www.pexels.com/photo/6786666/
+- Vaqueros azules: https://www.pexels.com/photo/4109797/
+- Falda de punto beige: https://www.pexels.com/photo/12956068/
+- Pantalón negro de piel: https://www.pexels.com/photo/37736489/
+- Vestido negro: https://www.pexels.com/photo/19895958/
+- Vestido de flores: https://www.pexels.com/photo/31683080/
+- Vestido lencero rosa: https://www.pexels.com/photo/36213224/
+- Blazer negra: https://www.pexels.com/photo/18453533/
+- Blazer blanca: https://www.pexels.com/photo/30455413/
+- Gabardina beige: https://www.pexels.com/photo/5418892/
+- Chaqueta vaquera: https://www.pexels.com/photo/11096066/
+- Cazadora oscura: https://www.pexels.com/photo/37595197/
+- Abrigo marrón: https://www.pexels.com/photo/16008693/
+- Zapatillas blancas: https://www.pexels.com/photo/4296075/
+- Botines negros: https://www.pexels.com/photo/32498579/
+- Mocasines negros: https://www.pexels.com/photo/38570110/
+- Sandalias negras: https://www.pexels.com/photo/31129840/
+- Botas altas negras: https://www.pexels.com/photo/27598915/
+- Botas altas marrones: https://www.pexels.com/photo/27596492/
+- Salones negros: https://www.pexels.com/photo/27204296/
+- Bailarinas camel: https://www.pexels.com/photo/37853534/
+- Bolso negro: https://www.pexels.com/photo/12428373/
+- Bolso marrón: https://www.pexels.com/photo/27174573/
+- Bolso tote negro: https://www.pexels.com/photo/1214212/
+- Gafas de sol: https://www.pexels.com/photo/14090246/
+- Bufanda de cuadros: https://www.pexels.com/photo/5603205/
+- Cinturón de piel: https://www.pexels.com/photo/31367059/
+- Aros dorados: https://www.pexels.com/photo/12145309/

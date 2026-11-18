@@ -436,3 +436,10 @@ img,svg{display:block}
 .adm-nums{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:12.5px;color:var(--cafe-2)}
 .adm-nums b{color:var(--cafe);font-weight:500}
 @media (max-width:380px){.adm-cifras{grid-template-columns:repeat(2,1fr)}}
+
+/* Catálogo de básicos */
+.cat-grid .st{width:100%;max-width:none}
+.cat-grid .st img{width:100%;border-radius:12px;transition:box-shadow .2s}
+.cat-item[aria-pressed=true] .st img{box-shadow:0 0 0 3px var(--cafe),0 2px 6px rgba(58,42,38,.25)}
+.cat-item[disabled]{opacity:.5}
+.cat-ok{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--cafe);color:var(--lino);display:grid;place-items:center}

@@ -89,7 +89,7 @@ function traducir(e) {
 const URLS = new Map();
 async function firmar(paths) {
   const ahora = Date.now();
-  const faltan = [...new Set(paths.filter(p => p && !((URLS.get(p) || {}).exp > ahora + 30 * 60e3)))];
+  const faltan = [...new Set(paths.filter(p => p && !esCatalogo(p) && !((URLS.get(p) || {}).exp > ahora + 30 * 60e3)))];
   for (let i = 0; i < faltan.length; i += 100) {
     const trozo = faltan.slice(i, i + 100);
     const { data, error } = await sb.storage.from('fotos').createSignedUrls(trozo, 6 * 3600);
@@ -97,7 +97,8 @@ async function firmar(paths) {
     (data || []).forEach(d => { if (d.signedUrl && d.path) URLS.set(d.path, { url: d.signedUrl, exp: ahora + 6 * 3600e3 }); });
   }
 }
-const urlFoto = p => p && URLS.get(p) ? URLS.get(p).url : '';
+const esCatalogo = p => typeof p === 'string' && p.startsWith('catalogo/');
+const urlFoto = p => esCatalogo(p) ? p : (p && URLS.get(p) ? URLS.get(p).url : '');
 
 function leerFoto(file, lado = 720) {
   return new Promise((res, rej) => {
@@ -530,8 +531,8 @@ function pHoy() {
     tarjeta = ventana(slug(l.nombre) + '.jpg', collage(l.prendas, { duena: true })) +
       `<div class="tl-pie" style="padding:12px 2px 0"><div><p class="eti">Planeado para hoy</p><p class="tl-nom voz">${esc(l.nombre)}</p>${e.plan ? `<p class="tl-plan">${esc(e.plan)}</p>` : ''}</div><button class="btn sec peq" data-a="dia" data-f="${h}">Cambiar</button></div>`;
   } else if (!misPrendas().length) {
-    tarjeta = tarjetaVacia('Tu armario está vacío', 'Sube fotos de tu ropa y te propondremos looks con lo que ya tienes.',
-      `<button class="btn pri" data-a="opc-anadir">${icono('camara', 19)} Añadir prendas</button>`);
+    tarjeta = tarjetaVacia('Tu armario está vacío', 'Sube fotos de tu ropa o empieza marcando los básicos que tienes, y te propondremos looks con lo que ya tienes.',
+      `<button class="btn pri" data-a="opc-anadir">${icono('camara', 19)} Añadir prendas</button><button class="btn sec" data-a="catalogo">${icono('armario', 19)} Elegir del catálogo de básicos</button>`);
   } else {
     if (!propHoy || propHoy.some(id => !P(id))) propHoy = proponer();
     tarjeta = propHoy.length < 2
@@ -601,7 +602,7 @@ function pArmario() {
   const colorBtn = ui.color ? `<span class="pt" style="background:${COLORES[ui.color]}"></span>${cap(colorTxt(ui.color))}` : 'Color';
   let cuerpo;
   if (!mio && !S.amigas.length) cuerpo = invitarCard();
-  else if (mio && !base.length) cuerpo = tarjetaVacia('Tu armario está vacío', 'Haz fotos a tu ropa o elígelas de la galería. Puedes subir varias a la vez.', `<button class="btn pri" data-a="opc-anadir">${icono('camara', 19)} Añadir prendas</button>`);
+  else if (mio && !base.length) cuerpo = tarjetaVacia('Tu armario está vacío', 'Haz fotos a tu ropa o elígelas de la galería. También puedes empezar marcando los básicos que tienes.', `<button class="btn pri" data-a="opc-anadir">${icono('camara', 19)} Añadir prendas</button><button class="btn sec" data-a="catalogo">${icono('armario', 19)} Elegir del catálogo de básicos</button>`);
   else if (!lst.length) cuerpo = `<div class="vacio-txt"><span class="voz">Nada por aquí</span>${base.length ? 'Prueba con otros filtros.' : 'Tus amigas todavía no han subido prendas.'}</div>`;
   else cuerpo = `<div class="rejilla">${lst.map(p => tile(p, ui.modo)).join('')}</div>`;
   return cabecera() + `<div class="pant">
@@ -802,6 +803,7 @@ async function asignarConAviso(f, lookId, alTerminar) {
 function abrirMas() {
   abrir('hoja', () => hojaCab('', '¿Qué quieres hacer?') + `<div class="opciones">
     <button class="opc" data-a="opc-anadir"><span class="ic">${icono('camara')}</span><span><b>Añadir prendas</b><span>Sube varias fotos de golpe</span></span></button>
+    <button class="opc" data-a="catalogo"><span class="ic">${icono('armario')}</span><span><b>Catálogo de básicos</b><span>Marca las prendas básicas que tienes</span></span></button>
     <button class="opc" data-a="opc-crear"><span class="ic">${icono('prenda')}</span><span><b>Crear look</b><span>Combina tu ropa y la de tus amigas</span></span></button>
     <button class="opc" data-a="opc-publicar"><span class="ic">${icono('publicar')}</span><span><b>Publicar look</b><span>Que tus amigas lo vean en su inicio</span></span></button>
   </div>`, { titulo: 'Crear' });
@@ -810,6 +812,30 @@ const botonesSubir = () => `<div class="subir">
   <label class="btn pri ancho grande">${icono('galeria')} Elegir de la galería<input class="sr" type="file" accept="image/*" multiple data-in="fotos"></label>
   <label class="btn sec ancho grande">${icono('camara')} Hacer una foto<input class="sr" type="file" accept="image/*" capture="environment" data-in="fotos"></label>
 </div>`;
+/* ---------- Catálogo de básicos: «Lo tengo» y pasa al armario ---------- */
+const CATALOGO = window.OCCASIO_CATALOGO || [];
+const enArmario = item => misPrendas().some(p => p.foto_path === item.foto);
+function abrirCatalogo(desdeOnb) {
+  abrir('pag', el => {
+    const lst = CATALOGO.filter(it => el._tipo === 'todo' || it.tipo === el._tipo);
+    const n = el._sel.size;
+    return `<header class="top borde"><button class="ib" data-a="cerrar" aria-label="Volver">${icono('atras')}</button><b>Catálogo de básicos</b><span style="width:44px"></span></header>
+    <div class="pant">
+      <div class="cab" style="padding-top:12px"><p class="eti">Empieza por lo básico</p><h1 class="tit voz">¿Cuáles tienes?</h1>
+        <p class="sub">Toca las prendas que tienes o que se parecen a las tuyas. Pasarán a tu armario y podrás usarlas en tus looks hasta que subas tus propias fotos.</p></div>
+      <div class="fila-x" role="group" aria-label="Tipo de prenda" style="margin-bottom:14px"><button class="chip" data-a="cat-tipo" data-v="todo" aria-pressed="${el._tipo === 'todo'}">Todo</button>${Object.entries(TIPO_FILTRO).map(([k, t]) => `<button class="chip" data-a="cat-tipo" data-v="${k}" aria-pressed="${el._tipo === k}">${t}</button>`).join('')}</div>
+      <div class="sel-grid cat-grid">${lst.map(it => {
+        const ya = enArmario(it), on = el._sel.has(it.id);
+        return `<button class="pr cat-item" data-a="cat-sel" data-id="${it.id}" aria-pressed="${on}" ${ya ? 'disabled' : ''}>
+          <span class="st"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}" loading="lazy">${on ? `<span class="cat-ok">${icono('ok', 16)}</span>` : ''}</span>
+          <span class="pr-nom">${esc(it.nombre)}</span><span class="pr-sub">${ya ? 'Ya en tu armario' : on ? 'Lo tengo' : TIPO_TXT[it.tipo]}</span></button>`;
+      }).join('')}</div>
+      <p class="sub" style="margin-top:18px;text-align:center">Fotos de ejemplo de Pexels. Tus amigas verán estas prendas en tu armario como «básico».</p>
+    </div>
+    <div class="pie-fijo"><button class="btn pri ancho grande" data-a="cat-guardar" ${n ? '' : 'disabled'}>${n ? `Añadir ${n} ${n === 1 ? 'prenda' : 'prendas'} a mi armario` : 'Toca las prendas que tienes'}</button></div>`;
+  }, { titulo: 'Catálogo de básicos', props: { _tipo: 'todo', _sel: new Set(), _onb: !!desdeOnb } });
+}
+
 function abrirAnadir() {
   abrir('hoja', () => hojaCab('', 'Añadir prendas') +
     `<p class="sub" style="margin:-4px 0 18px">Elige varias fotos a la vez. Después les pones tipo y color con un toque.</p>${botonesSubir()}`, { titulo: 'Añadir prendas' });
@@ -1187,7 +1213,9 @@ function pintaBienvenida() {
       <label class="foto-perfil" aria-label="Elegir foto de perfil">${foto ? `<img src="${esc(foto)}" alt="Tu foto de perfil">` : icono('perfil', 40)}<span class="mas">${icono('camara', 16)}</span><input class="sr" type="file" accept="image/*" data-in="onb-foto"></label>
       <p class="sub" style="margin-top:12px">Pon una foto para que tus amigas te reconozcan. Puedes hacerlo más tarde.</p></div>`,
     () => `<div><p class="eti">Tu armario</p><h1 class="tit voz" style="margin:6px 0 10px">Sube tus primeras prendas</h1>
-      <p style="margin-bottom:22px">Elige varias fotos a la vez. Luego les pones tipo y color con un toque.</p>${botonesSubir()}</div>`,
+      <p style="margin-bottom:22px">Elige varias fotos a la vez. Luego les pones tipo y color con un toque.</p>${botonesSubir()}
+      <p class="sub" style="margin:18px 0 10px;text-align:center">¿Sin fotos ahora? Empieza marcando lo que tienes:</p>
+      <button class="btn sec ancho" data-a="catalogo" data-onb="1">${icono('armario', 19)} Elegir del catálogo de básicos</button></div>`,
     () => `<div class="invita"><span class="avs"><span class="av" style="background:var(--lino);color:var(--cafe);box-shadow:inset 0 0 0 1.5px var(--borde)" aria-hidden="true">${icono('mas', 20)}</span></span>
       <p class="eti">Invita a tus amigas</p><h1 class="tit voz">Lo que no tienes, quizá lo tiene tu amiga.</h1>
       <p>Invítalas para ver sus armarios, pediros ropa prestada y saber qué lleváis cada una.</p>
@@ -1319,7 +1347,7 @@ const ACC = {
     const p = P(b.dataset.id); if (!p) return;
     confirmar('¿Borrar esta prenda?', `${esc(comillas(p.nombre))} desaparecerá de tu armario y de tus looks. No se puede deshacer.`, 'Borrar', async () => {
       await q(sb.from('prendas').delete().eq('id', p.id));
-      if (p.foto_path) sb.storage.from('fotos').remove([p.foto_path]);
+      if (p.foto_path && !esCatalogo(p.foto_path)) sb.storage.from('fotos').remove([p.foto_path]);
       S.prendas = S.prendas.filter(x => x.id !== p.id);
       cerrarTodas(); render(); aviso('Prenda borrada');
     });
@@ -1340,6 +1368,23 @@ const ACC = {
 
   /* Menú + */
   'opc-anadir': b => { const c = capaDe(b); c && cerrar(c); abrirAnadir(); },
+  catalogo: b => { const c = capaDe(b); c && cerrar(c); abrirCatalogo(!!b.dataset.onb); },
+  'cat-tipo': b => { const c = capaDe(b); c._tipo = b.dataset.v; repinta(c); },
+  'cat-sel': b => { const c = capaDe(b), id = b.dataset.id; c._sel.has(id) ? c._sel.delete(id) : c._sel.add(id); repinta(c); },
+  'cat-guardar': b => {
+    const c = capaDe(b);
+    const elegidas = CATALOGO.filter(it => c._sel.has(it.id) && !enArmario(it));
+    if (!elegidas.length) return;
+    intenta(b, async () => {
+      const nuevas = await q(sb.from('prendas').insert(elegidas.map(it => ({ nombre: it.nombre, tipo: it.tipo, color: it.color, temporada: it.temporada, foto_path: it.foto }))).select());
+      S.prendas.unshift(...nuevas);
+      cerrar(c);
+      const n = nuevas.length;
+      if (c._onb && $('#onb')) { paso = 2; pintaBienvenida(); }
+      else { Object.assign(ui, { modo: 'mio', tipo: 'todo', color: null, temp: null, sinUsar: false }); propHoy = null; irA('armario'); }
+      aviso(`${n} ${n === 1 ? 'básico añadido' : 'básicos añadidos'} a tu armario`);
+    });
+  },
   'opc-crear': b => {
     const c = capaDe(b); c && cerrar(c);
     if (!miArmario().length && !deAmigas().length) { aviso('Primero añade algunas prendas.'); abrirAnadir(); return; }
