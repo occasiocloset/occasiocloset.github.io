@@ -226,6 +226,8 @@ function abrir(tipo, pinta, opts = {}) {
   el.className = 'capa';
   el.innerHTML = tipo === 'hoja'
     ? `<div class="velo" data-a="cerrar"></div><section class="hoja" role="dialog" aria-modal="true" aria-label="${esc(opts.titulo || '')}" tabindex="-1"><div class="asa" aria-hidden="true"></div><div class="cuerpo"></div></section>`
+    : tipo === 'zoom'
+    ? `<div class="velo" data-a="cerrar"></div><section class="zoom" role="dialog" aria-modal="true" aria-label="${esc(opts.titulo || '')}" tabindex="-1"><div class="cuerpo"></div></section>`
     : `<section class="pag" role="dialog" aria-modal="true" aria-label="${esc(opts.titulo || '')}" tabindex="-1"><div class="cuerpo"></div></section>`;
   Object.assign(el, opts.props || {});
   const cuerpo = $('.cuerpo', el);
@@ -826,14 +828,31 @@ function abrirCatalogo(desdeOnb) {
       <div class="fila-x" role="group" aria-label="Tipo de prenda" style="margin-bottom:14px"><button class="chip" data-a="cat-tipo" data-v="todo" aria-pressed="${el._tipo === 'todo'}">Todo</button>${Object.entries(TIPO_FILTRO).map(([k, t]) => `<button class="chip" data-a="cat-tipo" data-v="${k}" aria-pressed="${el._tipo === k}">${t}</button>`).join('')}</div>
       <div class="sel-grid cat-grid">${lst.map(it => {
         const ya = enArmario(it), on = el._sel.has(it.id);
-        return `<button class="pr cat-item" data-a="cat-sel" data-id="${it.id}" aria-pressed="${on}" ${ya ? 'disabled' : ''}>
-          <span class="st"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}" loading="lazy">${on ? `<span class="cat-ok">${icono('ok', 16)}</span>` : ''}</span>
-          <span class="pr-nom">${esc(it.nombre)}</span><span class="pr-sub">${ya ? 'Ya en tu armario' : on ? 'Lo tengo' : TIPO_TXT[it.tipo]}</span></button>`;
+        return `<div class="pr cat-item ${ya ? 'ya' : ''} ${on ? 'on' : ''}">
+          <span class="st"><button class="cat-ver" data-a="cat-ver" data-id="${it.id}" aria-label="Ver en grande: ${esc(it.nombre)}"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}" loading="lazy"></button>
+            ${ya ? '' : `<button class="cat-check" data-a="cat-sel" data-id="${it.id}" aria-pressed="${on}" aria-label="Lo tengo: ${esc(it.nombre)}">${icono('ok', 16)}</button>`}</span>
+          <button class="cat-txt" data-a="cat-sel" data-id="${it.id}" ${ya ? 'disabled' : ''} aria-pressed="${on}"><span class="pr-nom">${esc(it.nombre)}</span><span class="pr-sub">${ya ? 'Ya en tu armario' : on ? 'Lo tengo ✓' : TIPO_TXT[it.tipo]}</span></button></div>`;
       }).join('')}</div>
       <p class="sub" style="margin-top:18px;text-align:center">Fotos de ejemplo de Pexels. Tus amigas verán estas prendas en tu armario como «básico».</p>
     </div>
     <div class="pie-fijo"><button class="btn pri ancho grande" data-a="cat-guardar" ${n ? '' : 'disabled'}>${n ? `Añadir ${n} ${n === 1 ? 'prenda' : 'prendas'} a mi armario` : 'Toca las prendas que tienes'}</button></div>`;
   }, { titulo: 'Catálogo de básicos', props: { _tipo: 'todo', _sel: new Set(), _onb: !!desdeOnb } });
+}
+
+/* Foto ampliada del catálogo, con «Lo tengo» y flechas para pasar de prenda */
+function abrirZoomCatalogo(capaCat, id) {
+  const ids = CATALOGO.filter(it => capaCat._tipo === 'todo' || it.tipo === capaCat._tipo).map(it => it.id);
+  abrir('zoom', el => {
+    const it = CATALOGO.find(x => x.id === ids[el._i]); if (!it) return '';
+    const ya = enArmario(it), on = capaCat._sel.has(it.id), n = ids.length;
+    return `<button class="ib zoom-x" data-a="cerrar" aria-label="Cerrar">${icono('cerrar')}</button>
+      <div class="zoom-foto"><img src="${esc(it.foto)}" alt="${esc(it.nombre)}">
+        ${n > 1 ? `<button class="zoom-nav izq" data-a="zoom-nav" data-d="-1" aria-label="Prenda anterior">${icono('izq')}</button><button class="zoom-nav der" data-a="zoom-nav" data-d="1" aria-label="Prenda siguiente">${icono('der')}</button>` : ''}</div>
+      <div class="zoom-pie"><div><p class="voz zoom-nom">${esc(it.nombre)}</p><p class="sub">${TIPO_TXT[it.tipo]} · ${cap(colorTxt(it.color, FEM_TIPO[it.tipo]))} · ${TEMP_TXT[it.temporada] || 'Todo el año'}</p></div>
+        <span class="zoom-num" aria-hidden="true">${el._i + 1}/${n}</span></div>
+      ${ya ? `<button class="btn sec ancho" disabled>Ya está en tu armario</button>`
+        : `<button class="btn ${on ? 'sec' : 'pri'} ancho grande" data-a="zoom-sel" data-id="${it.id}" aria-pressed="${on}">${on ? `${icono('ok', 18)} Lo tengo · tocar para quitar` : 'Lo tengo'}</button>`}`;
+  }, { titulo: 'Prenda del catálogo', props: { _i: Math.max(0, ids.indexOf(id)), _ids: ids, _cat: capaCat } });
 }
 
 function abrirAnadir() {
@@ -1371,6 +1390,13 @@ const ACC = {
   catalogo: b => { const c = capaDe(b); c && cerrar(c); abrirCatalogo(!!b.dataset.onb); },
   'cat-tipo': b => { const c = capaDe(b); c._tipo = b.dataset.v; repinta(c); },
   'cat-sel': b => { const c = capaDe(b), id = b.dataset.id; c._sel.has(id) ? c._sel.delete(id) : c._sel.add(id); repinta(c); },
+  'cat-ver': b => abrirZoomCatalogo(capaDe(b), b.dataset.id),
+  'zoom-nav': b => { const z = capaDe(b), n = z._ids.length; z._i = (z._i + +b.dataset.d + n) % n; repinta(z); },
+  'zoom-sel': b => {
+    const z = capaDe(b), c = z._cat, id = b.dataset.id;
+    c._sel.has(id) ? c._sel.delete(id) : c._sel.add(id);
+    repinta(c); repinta(z);
+  },
   'cat-guardar': b => {
     const c = capaDe(b);
     const elegidas = CATALOGO.filter(it => c._sel.has(it.id) && !enArmario(it));
@@ -1597,7 +1623,13 @@ document.addEventListener('submit', e => {
 });
 document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.in; if (k && IN[k]) IN[k](e.target); });
 document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.in; if (k && CH[k]) CH[k](e.target); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#capas').lastElementChild) cerrar(); });
+document.addEventListener('keydown', e => {
+  const top = $('#capas').lastElementChild;
+  if (e.key === 'Escape' && top) cerrar();
+  if (top && $('.zoom', top) && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    const b = $(`[data-a=zoom-nav][data-d="${e.key === 'ArrowLeft' ? -1 : 1}"]`, top); if (b) b.click();
+  }
+});
 document.addEventListener('visibilitychange', () => {
   if (document.hidden || !yo || Date.now() - ultimaCarga < 30e3) return;
   sb.rpc('procesar_dias', { p_hoy: hoy() }).then(() => recargar(true));
