@@ -540,8 +540,8 @@ function pHoy() {
     tarjeta = propHoy.length < 2
       ? tarjetaVacia('Faltan prendas para proponerte un look', 'Añade al menos una parte de arriba y una de abajo, o un vestido.', `<button class="btn sec" data-a="opc-anadir">Añadir prendas</button>`)
       : ventana('propuesta_de_hoy.jpg', collage(propHoy, { duena: true })) +
-        `<p class="nota">${icono('chispa', 16)} Con prendas que hace tiempo que no te pones</p>
-         <div class="acciones"><button class="btn pri" data-a="ponermelo">Ponérmelo</button><button class="btn sec" data-a="otra-hoy">${icono('otra', 18)} Otra combinación</button></div>`;
+        paletaHTML(propHoy.analisis) +
+        `<div class="acciones"><button class="btn pri" data-a="ponermelo">Ponérmelo</button><button class="btn sec" data-a="otra-hoy">${icono('otra', 18)} Otra combinación</button></div>`;
   }
   const resc = misPrendas().filter(p => sinUsar(p) && !prestadaA(p)).sort((a, b) => diasSin(b) - diasSin(a)).slice(0, 10);
   return cabecera(campana() + `<button class="ib borde" data-a="tab" data-t="perfil" aria-label="Tu perfil">${avatar(UID(), 's')}</button>`) +
@@ -724,25 +724,23 @@ function irA(t, opts = {}) {
    ===================================================================== */
 function temporadaActual() { const m = new Date().getMonth(); return (m === 11 || m <= 1) ? 'invierno' : (m >= 5 && m <= 7) ? 'verano' : 'entretiempo'; }
 const valeTemporada = (p, t) => p.temporada === 'todo' || p.temporada === t || (t !== 'verano' && (p.temporada === 'invierno' || p.temporada === 'entretiempo'));
+/* Propuesta con criterios de colorimetría y estilismo (ver estilismo.js).
+   Devuelve una lista de ids con «.analisis» = { paleta, motivo } */
 function proponer(excluir = []) {
-  const t = temporadaActual(), h = hoy();
-  const disp = miArmario().filter(p => !prestadaA(p) && !excluir.includes(p.id));
-  const elegir = tipo => {
-    let c = disp.filter(p => p.tipo === tipo && valeTemporada(p, t));
-    if (!c.length) c = disp.filter(p => p.tipo === tipo);
-    if (!c.length) return null;
-    const punt = p => (p.usos || 0) + (p.ultimo_uso && dif(h, p.ultimo_uso) < 7 ? 40 : 0) + Math.random() * 8;
-    return c.map(p => [punt(p), p]).sort((a, b) => a[0] - b[0])[0][1].id;
-  };
-  const ids = [];
-  const hayVestido = disp.some(p => p.tipo === 'vestido');
-  const hayDos = disp.some(p => p.tipo === 'arriba') && disp.some(p => p.tipo === 'abajo');
-  if (hayVestido && (!hayDos || Math.random() < 0.3)) ids.push(elegir('vestido'));
-  else { ids.push(elegir('arriba')); ids.push(elegir('abajo')); }
-  if (t !== 'verano') ids.push(elegir('abrigo'));
-  ids.push(elegir('calzado'));
-  if (Math.random() < 0.6) ids.push(elegir('accesorio'));
-  return ids.filter(Boolean);
+  const h = hoy();
+  const disp = miArmario().filter(p => !prestadaA(p)).map(p => ({
+    id: p.id, tipo: p.tipo, color: p.color, temporada: p.temporada, usos: p.usos || 0,
+    recien: !!(p.ultimo_uso && dif(h, p.ultimo_uso) < 7)
+  }));
+  return window.OCC_ESTILO.proponerOutfit(disp, { temporada: temporadaActual(), excluir });
+}
+/* Paleta del look: color protagonista, de apoyo y acento, y por qué funciona */
+function paletaHTML(a) {
+  if (!a || !a.paleta || !a.paleta.length) return '';
+  const N = window.OCC_ESTILO.NOMBRE;
+  return `<div class="paleta" aria-label="Paleta del look">
+    <div class="paleta-cols">${a.paleta.map(x => `<span class="paleta-c"><i style="background:${COLORES[x.color] || '#ccc'}"></i><b>${esc(cap(N[x.color] || x.color))}</b><small>${x.papel}</small></span>`).join('')}</div>
+    <p>${icono('chispa', 15)} ${esc(a.motivo)}</p></div>`;
 }
 function repeticion(f, lookId, prendas, amigas) {
   if (!amigas.length) return null;
@@ -1015,6 +1013,7 @@ function abrirCrear(pre = {}) {
       ${ventana('nuevo_look.jpg', collage(ids, { duena: true, vacio: 'Toca un hueco para elegir prenda o pide una propuesta.' }))}
       <button class="btn sec ancho" data-a="ed-proponer" style="margin-top:12px">${icono('chispa', 18)} Proponme uno</button>
       ${e.nota ? `<p class="nota">${icono('chispa', 16)} ${esc(e.nota)}</p>` : ''}
+      ${e.analisis ? paletaHTML(e.analisis) : ''}
       <div class="slots">${SLOTS.map(([k, t]) => {
         const p = e.slots[k] && P(e.slots[k]);
         return `<button class="slot ${p ? '' : 'vacio'} ${k === 'accesorio' ? 'ancho' : ''}" data-a="slot" data-s="${k}" aria-label="${t}: ${p ? esc(p.nombre) : 'vacío'}">
@@ -1060,7 +1059,7 @@ async function guardarLookEditor(capa, b) {
     const rep = repeticion(ed.dia, null, ids, amigas);
     if (rep) {
       abrirAvisoRep(rep, {
-        otro: () => { ponerEnSlots(ed, proponer(excluirPara(ed.dia, amigas))); ed.nota = 'Propuesta sin repetir con quien vas ese día'; repinta(capa); },
+        otro: () => { const nv = proponer(excluirPara(ed.dia, amigas)); ponerEnSlots(ed, nv); ed.analisis = nv.analisis; ed.nota = 'Propuesta sin repetir con quien vas ese día'; repinta(capa); },
         igual: terminar, textoIgual: 'Guardarlo igual'
       });
       return;
@@ -1475,15 +1474,15 @@ const ACC = {
   /* Crear look */
   slot: b => abrirSelector(capaDe(b), b.dataset.s),
   'sel-pest': b => { const c = capaDe(b); c._pest = b.dataset.v; repinta(c); },
-  'sel-elegir': b => { const c = capaDe(b); c._ed._ed.slots[c._slot] = b.dataset.id; c._ed._ed.nota = ''; repinta(c._ed); cerrar(c); },
-  'sel-quitar': b => { const c = capaDe(b); c._ed._ed.slots[c._slot] = null; repinta(c._ed); cerrar(c); },
+  'sel-elegir': b => { const c = capaDe(b); c._ed._ed.slots[c._slot] = b.dataset.id; c._ed._ed.nota = ''; c._ed._ed.analisis = null; repinta(c._ed); cerrar(c); },
+  'sel-quitar': b => { const c = capaDe(b); c._ed._ed.slots[c._slot] = null; c._ed._ed.analisis = null; repinta(c._ed); cerrar(c); },
   'ed-proponer': b => {
     const c = capaDe(b), ed = c._ed, ids = Object.values(ed.slots).filter(Boolean);
     const amigas = ed.dia && S.cal[ed.dia] ? (S.cal[ed.dia].amigas || []) : [];
     const nuevo = proponer([...(ids.length ? [principal(ids)] : []), ...(ed.dia ? excluirPara(ed.dia, amigas) : [])]);
     if (nuevo.length < 2) { aviso('Añade más prendas para que podamos proponerte looks.'); return; }
     ponerEnSlots(ed, nuevo);
-    ed.nota = 'Para esta temporada, con prendas que hace tiempo que no te pones';
+    ed.nota = ''; ed.analisis = nuevo.analisis;
     repinta(c);
   },
   'ed-dia': b => { const c = capaDe(b); c._ed.dia = b.dataset.f || null; repinta(c); },
