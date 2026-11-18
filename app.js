@@ -850,6 +850,7 @@ function abrirZoomCatalogo(capaCat, id) {
         ${n > 1 ? `<button class="zoom-nav izq" data-a="zoom-nav" data-d="-1" aria-label="Prenda anterior">${icono('izq')}</button><button class="zoom-nav der" data-a="zoom-nav" data-d="1" aria-label="Prenda siguiente">${icono('der')}</button>` : ''}</div>
       <div class="zoom-pie"><div><p class="voz zoom-nom">${esc(it.nombre)}</p><p class="sub">${TIPO_TXT[it.tipo]} · ${cap(colorTxt(it.color, FEM_TIPO[it.tipo]))} · ${TEMP_TXT[it.temporada] || 'Todo el año'}</p></div>
         <span class="zoom-num" aria-hidden="true">${el._i + 1}/${n}</span></div>
+      ${it.descripcion ? `<p class="zoom-desc">${esc(it.descripcion)}</p>` : ''}
       ${ya ? `<button class="btn sec ancho" disabled>Ya está en tu armario</button>`
         : `<button class="btn ${on ? 'sec' : 'pri'} ancho grande" data-a="zoom-sel" data-id="${it.id}" aria-pressed="${on}">${on ? `${icono('ok', 18)} Lo tengo · tocar para quitar` : 'Lo tengo'}</button>`}`;
   }, { titulo: 'Prenda del catálogo', props: { _i: Math.max(0, ids.indexOf(id)), _ids: ids, _cat: capaCat } });
