@@ -423,3 +423,16 @@ img,svg{display:block}
 .lista-amigas b{font-weight:500}
 .pr .st img{background:#fff}
 .editar-nom{display:inline-flex;align-items:center;gap:6px}
+
+/* Panel de administración */
+.adm-cifras{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.adm-cifras div{background:var(--papel);border-radius:16px;padding:12px 8px;text-align:center;box-shadow:inset 0 0 0 1px var(--linea)}
+.adm-cifras b{display:block;font:italic 400 24px/1.1 var(--serif)}
+.adm-cifras span{font-size:11.5px;color:var(--cafe-2);line-height:1.25;display:block}
+.adm .adm-cab{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:4px}
+.adm .adm-cab b{font-weight:500;font-size:15px;display:block}
+.adm .adm-cab small{margin:0;word-break:break-all}
+.adm-tag{flex:none;font-size:11.5px;font-weight:500;background:var(--arena);border-radius:999px;padding:3px 9px}
+.adm-nums{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px;font-size:12.5px;color:var(--cafe-2)}
+.adm-nums b{color:var(--cafe);font-weight:500}
+@media (max-width:380px){.adm-cifras{grid-template-columns:repeat(2,1fr)}}

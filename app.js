@@ -146,6 +146,7 @@ async function cargarTodo() {
   S.prestamos = prestamos;
   S.reac = posts.length ? await q(sb.from('reacciones').select('*').in('publicacion', posts.map(p => p.id))) : [];
   await firmar([...prendas.map(p => p.foto_path), ...perfiles.map(p => p.foto_path)]);
+  S.admin = await sb.rpc('soy_admin').then(r => r.data === true, () => false);
   ultimaCarga = Date.now();
 }
 async function recargar(silencio) {
@@ -300,6 +301,7 @@ function mostrarAcceso(modo = 'inicio') {
         <label class="campo"><span>Correo</span><input class="inp" name="correo" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" required></label>
         <label class="campo"><span>Contraseña (mínimo 8 caracteres)</span><input class="inp" name="clave" type="password" autocomplete="new-password" minlength="8" required></label>
         <label class="chk"><input type="checkbox" name="ok"><span>Tengo 14 años o más y acepto la ${priv}</span></label>
+        <label class="chk" style="margin-top:-6px"><input type="checkbox" name="novedades"><span>Quiero recibir novedades de Occasio por correo (opcional)</span></label>
         <p class="error" role="alert"></p>
         <button class="btn pri ancho grande" type="submit">Crear cuenta</button>
       </form>
@@ -350,7 +352,7 @@ const FORMS = {
     const inv = leerInvitacion();
     const { data, error } = await sb.auth.signUp({
       email: correo, password: clave,
-      options: { data: { nombre: nom, mayor_14: true, acepta_privacidad: new Date().toISOString() }, emailRedirectTo: urlBase() + (inv ? '?invita=' + encodeURIComponent(inv) : '') }
+      options: { data: { nombre: nom, mayor_14: true, acepta_privacidad: new Date().toISOString(), acepta_novedades: !!f.novedades.checked }, emailRedirectTo: urlBase() + (inv ? '?invita=' + encodeURIComponent(inv) : '') }
     });
     if (error) return errorForm(f, traducir(error));
     correoPendiente = correo;
@@ -1072,11 +1074,80 @@ function abrirAjustes() {
   abrir('hoja', () => hojaCab('Perfil', 'Ajustes', false) + `<div class="opciones">
     <button class="opc" data-a="editar-perfil"><span class="ic">${icono('perfil')}</span><span><b>Editar perfil</b><span>Tu nombre y tu foto</span></span></button>
     <button class="opc" data-a="peticiones"><span class="ic">${icono('sobre')}</span><span><b>Préstamos</b><span>Peticiones y prendas prestadas</span></span></button>
+    ${S.admin ? `<button class="opc" data-a="admin"><span class="ic">${icono('filtro')}</span><span><b>Panel de administración</b><span>Solo lo ves tú: usuarias, actividad y lista para el CRM</span></span></button>` : ''}
+    <label class="opc interr" style="cursor:pointer"><span class="ic">${icono('sobre')}</span><span style="flex:1"><b>Novedades por correo</b><span>Recibir correos de Occasio con novedades</span></span><input type="checkbox" data-in="novedades" ${S.perfil && S.perfil.acepta_novedades ? 'checked' : ''}></label>
     <a class="opc" href="privacidad.html" target="_blank" rel="noopener"><span class="ic">${icono('ok')}</span><span><b>Política de privacidad</b><span>Qué datos guardamos y para qué</span></span></a>
     <button class="opc" data-a="cerrar-sesion"><span class="ic">${icono('atras')}</span><span><b>Cerrar sesión</b><span>${esc((yo && yo.email) || '')}</span></span></button>
     <button class="opc" data-a="borrar-cuenta"><span class="ic">${icono('cerrar')}</span><span><b>Borrar mi cuenta</b><span>Se borran tu armario, tus looks y tus fotos</span></span></button>
   </div>`, { titulo: 'Ajustes' });
 }
+/* ---------- Panel de administración (solo cuentas de la tabla «admins») ---------- */
+const FILTROS_ADMIN = [['todas', 'Todas'], ['activas', 'Activas 7 días'], ['novedades', 'Aceptan novedades'], ['vacias', 'Sin prendas']];
+const fechaHora = ts => ts ? new Date(ts).toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+const haceTs = ts => ts ? haceTxt(fechaDe(ts)) : 'Nunca';
+function filasAdmin(el) {
+  const q = (el._q || '').trim().toLowerCase(), h = hoy();
+  return (el._filas || []).filter(u =>
+    (!q || (u.nombre || '').toLowerCase().includes(q) || (u.correo || '').toLowerCase().includes(q)) &&
+    (el._f !== 'activas' || (u.ultima_actividad && dif(h, fechaDe(u.ultima_actividad)) <= 7)) &&
+    (el._f !== 'novedades' || u.acepta_novedades) &&
+    (el._f !== 'vacias' || !u.prendas));
+}
+function listaAdmin(el) {
+  const fs = filasAdmin(el);
+  if (!fs.length) return `<p class="vacio-txt">No hay usuarias con ese filtro.</p>`;
+  return `<p class="h-sec">${fs.length} ${fs.length === 1 ? 'usuaria' : 'usuarias'}</p>` + fs.map(u => `<div class="peti adm">
+    <div class="adm-cab"><div><b>${esc(u.nombre || 'Sin nombre')}</b><small>${esc(u.correo || '')}</small></div>${u.acepta_novedades ? '<span class="adm-tag">Novedades ✓</span>' : ''}</div>
+    <small>Alta: ${esc(fechaHora(u.alta))} · Último acceso: ${esc(haceTs(u.ultimo_acceso))} · Última actividad: ${esc(haceTs(u.ultima_actividad))}</small>
+    <div class="adm-nums"><span><b>${u.prendas}</b> prendas</span><span><b>${u.looks}</b> looks</span><span><b>${u.amigas}</b> amigas</span><span><b>${u.publicaciones}</b> publicadas</span><span><b>${u.prestamos_pedidos}</b> pedidos</span><span><b>${u.prestamos_hechos}</b> prestados</span><span><b>${u.dias_planificados}</b> días planificados</span></div>
+  </div>`).join('');
+}
+function abrirAdmin() {
+  const el = abrir('pag', el => {
+    const fs = el._filas || [], h = hoy();
+    const dias = (ts, n) => ts && dif(h, fechaDe(ts)) <= n;
+    const suma = k => fs.reduce((t, u) => t + (u[k] || 0), 0);
+    const cifras = [
+      ['Usuarias', fs.length], ['Nuevas (7 días)', fs.filter(u => dias(u.alta, 7)).length],
+      ['Activas (7 días)', fs.filter(u => dias(u.ultima_actividad, 7)).length], ['Aceptan novedades', fs.filter(u => u.acepta_novedades).length],
+      ['Prendas subidas', suma('prendas')], ['Préstamos pedidos', suma('prestamos_pedidos')]
+    ];
+    return `<header class="top borde"><button class="ib" data-a="cerrar" aria-label="Volver">${icono('atras')}</button><b>Administración</b><button class="ib" data-a="admin-recargar" aria-label="Actualizar">${icono('otra', 20)}</button></header>
+    <div class="pant">
+      <div class="cab" style="padding-top:12px"><p class="eti">Solo lo ves tú</p><h1 class="tit voz">Panel de Occasio</h1></div>
+      ${el._error ? `<div class="vacia"><span class="voz">No se ha podido cargar</span><p>${esc(el._error)}</p></div>` : !el._filas ? `<p class="vacio-txt">Cargando usuarias…</p>` : `
+      <div class="adm-cifras">${cifras.map(([t, n]) => `<div><b>${n}</b><span>${t}</span></div>`).join('')}</div>
+      <button class="btn pri ancho" data-a="admin-csv" style="margin-bottom:6px">${icono('publicar', 18)} Descargar lista para el CRM (Excel / Google Sheets)</button>
+      <p class="sub" style="margin-bottom:16px">Descarga las usuarias del filtro que tengas elegido. Para enviar correos comerciales, usa solo las que aceptan novedades.</p>
+      <label class="campo"><span class="sr">Buscar por nombre o correo</span><input class="inp" data-in="adm-buscar" value="${esc(el._q || '')}" placeholder="Buscar por nombre o correo" autocomplete="off"></label>
+      <div class="fila-x" role="group" aria-label="Filtrar usuarias" style="margin-bottom:6px">${FILTROS_ADMIN.map(([k, t]) => `<button class="chip" data-a="admin-filtro" data-v="${k}" aria-pressed="${el._f === k}">${t}</button>`).join('')}</div>
+      <div id="adm-lista">${listaAdmin(el)}</div>`}
+    </div>`;
+  }, { titulo: 'Administración', props: { _filas: null, _q: '', _f: 'todas', _error: '' } });
+  cargarAdmin(el);
+}
+async function cargarAdmin(el) {
+  const { data, error } = await sb.rpc('admin_usuarias');
+  el._error = error ? traducir(error) : '';
+  el._filas = data || [];
+  repinta(el);
+}
+function descargarCSV(el) {
+  const fs = filasAdmin(el);
+  if (!fs.length) { aviso('No hay usuarias para descargar con ese filtro.'); return; }
+  const cab = ['Nombre', 'Correo', 'Fecha de alta', 'Último acceso', 'Última actividad', 'Acepta novedades', 'Prendas', 'Looks', 'Amigas', 'Publicaciones', 'Préstamos pedidos', 'Préstamos hechos', 'Días planificados'];
+  const celda = v => { const s = String(v ?? ''); return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const filas = fs.map(u => [u.nombre, u.correo, fechaHora(u.alta), fechaHora(u.ultimo_acceso), fechaHora(u.ultima_actividad), u.acepta_novedades ? 'Sí' : 'No',
+    u.prendas, u.looks, u.amigas, u.publicaciones, u.prestamos_pedidos, u.prestamos_hechos, u.dias_planificados]);
+  const csv = '﻿' + [cab, ...filas].map(f => f.map(celda).join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `occasio-usuarias-${hoy()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  aviso(`Descargada la lista con ${fs.length} ${fs.length === 1 ? 'usuaria' : 'usuarias'}`);
+}
+
 function abrirEditarPerfil() {
   abrir('hoja', el => hojaCab('Perfil', 'Editar perfil', false) +
     `<label class="foto-perfil" aria-label="Cambiar foto de perfil">${el._src ? `<img src="${el._src}" alt="Tu foto">` : urlFoto(S.perfil.foto_path) ? `<img src="${esc(urlFoto(S.perfil.foto_path))}" alt="Tu foto">` : icono('perfil', 40)}<span class="mas">${icono('camara', 16)}</span><input class="sr" type="file" accept="image/*" data-in="perfil-foto"></label>
@@ -1394,6 +1465,10 @@ const ACC = {
     });
   },
   'cerrar-sesion': b => intenta(b, async () => { await sb.auth.signOut(); salir(); }),
+  admin: b => { const c = capaDe(b); c && cerrar(c); abrirAdmin(); },
+  'admin-recargar': b => { const c = capaDe(b); c._filas = null; repinta(c); cargarAdmin(c); },
+  'admin-filtro': b => { const c = capaDe(b); c._f = b.dataset.v; repinta(c); },
+  'admin-csv': b => descargarCSV(capaDe(b)),
   'borrar-cuenta': () => confirmar('¿Borrar tu cuenta?', 'Se borrarán para siempre tu armario, tus fotos, tus looks, tu calendario y tus publicaciones. No se puede deshacer.', 'Borrar mi cuenta', async () => {
     const mias = await q(sb.storage.from('fotos').list(UID(), { limit: 1000 }));
     if (mias && mias.length) await sb.storage.from('fotos').remove(mias.map(f => `${UID()}/${f.name}`));
@@ -1429,6 +1504,7 @@ const IN = {
   'ed-texto': t => { capaDe(t)._ed.texto = t.value; },
   'pub-texto': t => { capaDe(t)._txt = t.value; },
   'ep-nombre': t => { capaDe(t)._e.nombre = t.value; },
+  'adm-buscar': t => { const c = capaDe(t); c._q = t.value; const l = $('#adm-lista', c); if (l) l.innerHTML = listaAdmin(c); },
   'perfil-nombre': t => { capaDe(t)._nombre = t.value; },
   'dia-plan': t => {
     const f = t.dataset.f;
@@ -1451,7 +1527,13 @@ const CH = {
     try { const r = await leerFoto(f, 320); const c = capaDe(t); c._src = r.src; c._blob = r.blob; repinta(c); }
     catch (e) { aviso(traducir(e)); }
   },
-  'ed-publicar': t => { const c = capaDe(t); c._ed.publicar = t.checked; repinta(c); }
+  'ed-publicar': t => { const c = capaDe(t); c._ed.publicar = t.checked; repinta(c); },
+  novedades: t => intenta(null, async () => {
+    const v = t.checked;
+    await q(sb.from('perfiles').update({ acepta_novedades: v }).eq('id', UID()));
+    S.perfil.acepta_novedades = v;
+    aviso(v ? 'Recibirás novedades de Occasio por correo' : 'Ya no recibirás novedades por correo');
+  })
 };
 
 document.addEventListener('click', e => {
