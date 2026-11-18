@@ -607,7 +607,7 @@ function pArmario() {
   else if (mio && !base.length) cuerpo = tarjetaVacia('Tu armario está vacío', 'Haz fotos a tu ropa o elígelas de la galería. También puedes empezar marcando los básicos que tienes.', `<button class="btn pri" data-a="opc-anadir">${icono('camara', 19)} Añadir prendas</button><button class="btn sec" data-a="catalogo">${icono('armario', 19)} Elegir del catálogo de básicos</button>`);
   else if (!lst.length) cuerpo = `<div class="vacio-txt"><span class="voz">Nada por aquí</span>${base.length ? 'Prueba con otros filtros.' : 'Tus amigas todavía no han subido prendas.'}</div>`;
   else cuerpo = `<div class="rejilla">${lst.map(p => tile(p, ui.modo)).join('')}</div>`;
-  return cabecera() + `<div class="pant">
+  return cabecera() + `<div class="pant ancha">
     <div class="cab"><p class="eti">${lst.length} ${lst.length === 1 ? 'prenda' : 'prendas'}</p><h1 class="tit voz">${mio ? 'Tu armario' : 'Armario de amigas'}</h1></div>
     <div class="seg" role="group" aria-label="Qué armario ver"><button data-a="arm-modo" data-v="mio" aria-pressed="${mio}">Mi armario</button><button data-a="arm-modo" data-v="amigas" aria-pressed="${!mio}">Armario de amigas</button></div>
     ${mio || !S.amigas.length ? '' : `<div class="avf" role="group" aria-label="Filtrar por amiga">
@@ -822,7 +822,7 @@ function abrirCatalogo(desdeOnb) {
     const lst = CATALOGO.filter(it => el._tipo === 'todo' || it.tipo === el._tipo);
     const n = el._sel.size;
     return `<header class="top borde"><button class="ib" data-a="cerrar" aria-label="Volver">${icono('atras')}</button><b>Catálogo de básicos</b><span style="width:44px"></span></header>
-    <div class="pant">
+    <div class="pant ancha">
       <div class="cab" style="padding-top:12px"><p class="eti">Empieza por lo básico</p><h1 class="tit voz">¿Cuáles tienes?</h1>
         <p class="sub">Toca las prendas que tienes o que se parecen a las tuyas. Pasarán a tu armario y podrás usarlas en tus looks hasta que subas tus propias fotos.</p></div>
       <div class="fila-x" role="group" aria-label="Tipo de prenda" style="margin-bottom:14px"><button class="chip" data-a="cat-tipo" data-v="todo" aria-pressed="${el._tipo === 'todo'}">Todo</button>${Object.entries(TIPO_FILTRO).map(([k, t]) => `<button class="chip" data-a="cat-tipo" data-v="${k}" aria-pressed="${el._tipo === k}">${t}</button>`).join('')}</div>
@@ -1120,6 +1120,7 @@ function abrirAjustes() {
   abrir('hoja', () => hojaCab('Perfil', 'Ajustes', false) + `<div class="opciones">
     <button class="opc" data-a="editar-perfil"><span class="ic">${icono('perfil')}</span><span><b>Editar perfil</b><span>Tu nombre y tu foto</span></span></button>
     <button class="opc" data-a="peticiones"><span class="ic">${icono('sobre')}</span><span><b>Préstamos</b><span>Peticiones y prendas prestadas</span></span></button>
+    ${instalada() ? '' : `<button class="opc" data-a="instalar"><span class="ic">${icono('publicar')}</span><span><b>Instalar Occasio en tu móvil</b><span>Ábrela a pantalla completa, como una app</span></span></button>`}
     ${S.admin ? `<button class="opc" data-a="admin"><span class="ic">${icono('filtro')}</span><span><b>Panel de administración</b><span>Solo lo ves tú: usuarias, actividad y lista para el CRM</span></span></button>` : ''}
     <label class="opc interr" style="cursor:pointer"><span class="ic">${icono('sobre')}</span><span style="flex:1"><b>Novedades por correo</b><span>Recibir correos de Occasio con novedades</span></span><input type="checkbox" data-in="novedades" ${S.perfil && S.perfil.acepta_novedades ? 'checked' : ''}></label>
     <a class="opc" href="privacidad.html" target="_blank" rel="noopener"><span class="ic">${icono('ok')}</span><span><b>Política de privacidad</b><span>Qué datos guardamos y para qué</span></span></a>
@@ -1127,6 +1128,26 @@ function abrirAjustes() {
     <button class="opc" data-a="borrar-cuenta"><span class="ic">${icono('cerrar')}</span><span><b>Borrar mi cuenta</b><span>Se borran tu armario, tus looks y tus fotos</span></span></button>
   </div>`, { titulo: 'Ajustes' });
 }
+/* ---------- Instalar como app (pantalla completa) ---------- */
+let avisoInstalar = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); avisoInstalar = e; });
+const instalada = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+async function instalarApp() {
+  if (avisoInstalar) {
+    avisoInstalar.prompt();
+    const r = await avisoInstalar.userChoice.catch(() => null);
+    avisoInstalar = null;
+    if (r && r.outcome === 'accepted') aviso('Occasio instalada: ábrela desde tu pantalla de inicio');
+    return;
+  }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  abrir('hoja', () => hojaCab('Pantalla completa', 'Instala Occasio en tu móvil') +
+    `<p style="margin:-4px 0 16px">Así se abre a pantalla completa, sin la barra del navegador, como cualquier otra app.</p>
+    ${ios ? `<ol class="pasos"><li>Abre esta página en <b>Safari</b>.</li><li>Toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba).</li><li>Elige <b>«Añadir a pantalla de inicio»</b> y toca <b>Añadir</b>.</li></ol>`
+      : `<ol class="pasos"><li>Abre esta página en <b>Chrome</b>.</li><li>Toca el menú <b>⋮</b> (arriba a la derecha).</li><li>Elige <b>«Instalar aplicación»</b> o <b>«Añadir a pantalla de inicio»</b>.</li></ol>`}
+    <p class="sub" style="margin-top:12px">Después, abre Occasio desde el icono de la percha en tu pantalla de inicio.</p>`, { titulo: 'Instalar Occasio' });
+}
+
 /* ---------- Panel de administración (solo cuentas de la tabla «admins») ---------- */
 const FILTROS_ADMIN = [['todas', 'Todas'], ['activas', 'Activas 7 días'], ['novedades', 'Aceptan novedades'], ['vacias', 'Sin prendas']];
 const fechaHora = ts => ts ? new Date(ts).toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
@@ -1538,6 +1559,7 @@ const ACC = {
   },
   'cerrar-sesion': b => intenta(b, async () => { await sb.auth.signOut(); salir(); }),
   admin: b => { const c = capaDe(b); c && cerrar(c); abrirAdmin(); },
+  instalar: b => { const c = capaDe(b); c && cerrar(c); instalarApp(); },
   'admin-recargar': b => { const c = capaDe(b); c._filas = null; repinta(c); cargarAdmin(c); },
   'admin-filtro': b => { const c = capaDe(b); c._f = b.dataset.v; repinta(c); },
   'admin-csv': b => descargarCSV(capaDe(b)),
@@ -1645,6 +1667,7 @@ setInterval(() => {
    ARRANQUE
    ===================================================================== */
 $$('[data-ico]').forEach(s => { s.outerHTML = icono(s.dataset.ico, s.dataset.ico === 'mas' ? 26 : 23); });
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 guardarInvitacionDeURL();
 if (/type=recovery/.test(location.hash)) recuperando = true;
 if (!configurado) { sinCarga(); mostrarAcceso('sin-config'); return; }
