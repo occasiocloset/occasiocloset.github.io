@@ -29,7 +29,7 @@ window.OCCASIO_CATALOGO = [
   "color": "blanco",
   "temporada": "todo",
   "foto": "catalogo/camisa-rayas.jpg",
-  "descripcion": "Camisa de algodón con rayas finas. Abierta sobre una camiseta, metida por dentro de una falda o con vaqueros para un look de diario."
+  "descripcion": "Camisa de rayas finas y manga larga. Abierta sobre una camiseta, metida por dentro de una falda o con vaqueros para un look de diario."
  },
  {
   "id": "camisa-blanca",
@@ -41,13 +41,13 @@ window.OCCASIO_CATALOGO = [
   "descripcion": "Camisa blanca de cuello clásico y botones. Sirve para clase, una cena o una entrevista; queda bien remangada y con vaqueros."
  },
  {
-  "id": "camisa-gris",
-  "nombre": "Camisa gris",
+  "id": "camisa-azul",
+  "nombre": "Camisa azul",
   "tipo": "arriba",
-  "color": "gris",
+  "color": "vaquero",
   "temporada": "todo",
-  "foto": "catalogo/camisa-gris.jpg",
-  "descripcion": "Camisa lisa en gris, más suave que la blanca. Combina con pantalón negro, vaqueros o debajo de un jersey de punto."
+  "foto": "catalogo/camisa-azul.jpg",
+  "descripcion": "Camisa de algodón en azul claro. Un clásico que combina con vaqueros, pantalón beige o negro y faldas."
  },
  {
   "id": "jersey-marinero",
@@ -65,7 +65,7 @@ window.OCCASIO_CATALOGO = [
   "color": "crema",
   "temporada": "invierno",
   "foto": "catalogo/jersey-crema.jpg",
-  "descripcion": "Jersey de punto calentito en tono crema. Un básico de invierno que ilumina el look y va con casi todo."
+  "descripcion": "Jersey de punto calentito en tono crema, con lazo en el cuello. Un básico de invierno que ilumina el look y va con casi todo."
  },
  {
   "id": "cardigan-rojo",
@@ -77,13 +77,13 @@ window.OCCASIO_CATALOGO = [
   "descripcion": "Cárdigan de punto con botones en rojo intenso. Da color a un look sencillo de vaqueros y camiseta blanca."
  },
  {
-  "id": "jersey-rojo",
-  "nombre": "Jersey de punto rojo",
+  "id": "jersey-negro",
+  "nombre": "Jersey negro",
   "tipo": "arriba",
-  "color": "rojo",
+  "color": "negro",
   "temporada": "invierno",
-  "foto": "catalogo/jersey-rojo.jpg",
-  "descripcion": "Jersey de punto en rojo con cuello en contraste. Una prenda alegre para los días fríos; queda bien con vaqueros o falda negra."
+  "foto": "catalogo/jersey-negro.jpg",
+  "descripcion": "Jersey de punto negro, liso y fácil de combinar. Va con vaqueros, faldas y pantalones de cualquier color."
  },
  {
   "id": "blusa-blanca",
@@ -92,16 +92,16 @@ window.OCCASIO_CATALOGO = [
   "color": "blanco",
   "temporada": "todo",
   "foto": "catalogo/blusa-blanca.jpg",
-  "descripcion": "Blusa ligera y fluida en blanco. Más arreglada que una camiseta: ideal con falda, pantalón de vestir o vaqueros."
+  "descripcion": "Blusa blanca de manga abullonada. Más arreglada que una camiseta: ideal con falda, pantalón de vestir o vaqueros."
  },
  {
-  "id": "top-tirantes",
-  "nombre": "Top blanco de tirantes",
+  "id": "top-negro",
+  "nombre": "Top negro de tirantes",
   "tipo": "arriba",
-  "color": "blanco",
+  "color": "negro",
   "temporada": "verano",
-  "foto": "catalogo/top-tirantes.jpg",
-  "descripcion": "Top de tirantes finos en blanco. Para el verano o como capa debajo de una blazer o un cárdigan."
+  "foto": "catalogo/top-negro.jpg",
+  "descripcion": "Top negro de tirantes, liso. Para el verano con vaqueros o faldas, o como capa debajo de una blazer o un cárdigan."
  },
  {
   "id": "sudadera-beige",
@@ -119,25 +119,25 @@ window.OCCASIO_CATALOGO = [
   "color": "vaquero",
   "temporada": "todo",
   "foto": "catalogo/vaqueros-azules.jpg",
-  "descripcion": "Vaqueros de denim azul de corte clásico. La prenda que más combina del armario: con camisetas, camisas, jerséis y blazers."
+  "descripcion": "Vaqueros de denim azul de corte recto. La prenda que más combina del armario: con camisetas, camisas, jerséis y blazers."
  },
  {
-  "id": "falda-beige",
-  "nombre": "Falda de punto beige",
-  "tipo": "abajo",
-  "color": "beige",
-  "temporada": "entretiempo",
-  "foto": "catalogo/falda-beige.jpg",
-  "descripcion": "Falda de punto canalé en beige. Suave y versátil: con jersey y botas en invierno o con camiseta en entretiempo."
- },
- {
-  "id": "pantalon-piel",
-  "nombre": "Pantalón negro de piel",
+  "id": "falda-negra",
+  "nombre": "Falda negra",
   "tipo": "abajo",
   "color": "negro",
-  "temporada": "invierno",
-  "foto": "catalogo/pantalon-piel.jpg",
-  "descripcion": "Pantalón negro de efecto piel. Le da un toque especial a una camiseta básica o a una blusa para salir."
+  "temporada": "todo",
+  "foto": "catalogo/falda-negra.jpg",
+  "descripcion": "Falda negra con vuelo. Con camiseta y zapatillas para el día, o con blusa y botas para salir."
+ },
+ {
+  "id": "pantalon-negro",
+  "nombre": "Pantalón negro ancho",
+  "tipo": "abajo",
+  "color": "negro",
+  "temporada": "todo",
+  "foto": "catalogo/pantalon-negro.jpg",
+  "descripcion": "Pantalón negro de pierna ancha. Cómodo y arreglado a la vez: con camisa, jersey o una camiseta básica."
  },
  {
   "id": "vestido-negro",
@@ -176,13 +176,13 @@ window.OCCASIO_CATALOGO = [
   "descripcion": "Blazer negra de corte recto. Convierte cualquier look en uno arreglado: con vaqueros y camiseta o con pantalón de vestir."
  },
  {
-  "id": "blazer-blanca",
-  "nombre": "Blazer blanca",
+  "id": "blazer-beige",
+  "nombre": "Blazer beige",
   "tipo": "abrigo",
-  "color": "blanco",
+  "color": "beige",
   "temporada": "entretiempo",
-  "foto": "catalogo/blazer-blanca.jpg",
-  "descripcion": "Blazer en blanco roto. Muy luminosa para primavera, con vaqueros, faldas o encima de un vestido."
+  "foto": "catalogo/blazer-beige.jpg",
+  "descripcion": "Blazer en tono beige. Luminosa y versátil para primavera y otoño: con vaqueros, faldas o encima de un vestido."
  },
  {
   "id": "gabardina",
@@ -191,7 +191,7 @@ window.OCCASIO_CATALOGO = [
   "color": "beige",
   "temporada": "entretiempo",
   "foto": "catalogo/gabardina.jpg",
-  "descripcion": "Gabardina clásica en beige. El abrigo de entretiempo por excelencia: va igual de bien con vaqueros que con vestido."
+  "descripcion": "Gabardina clásica en beige, con cinturón. El abrigo de entretiempo por excelencia: va igual de bien con vaqueros que con vestido."
  },
  {
   "id": "chaqueta-vaquera",
@@ -201,15 +201,6 @@ window.OCCASIO_CATALOGO = [
   "temporada": "entretiempo",
   "foto": "catalogo/chaqueta-vaquera.jpg",
   "descripcion": "Chaqueta vaquera de denim. Para entretiempo, encima de vestidos, camisetas o sudaderas."
- },
- {
-  "id": "cazadora",
-  "nombre": "Cazadora oscura",
-  "tipo": "abrigo",
-  "color": "negro",
-  "temporada": "entretiempo",
-  "foto": "catalogo/cazadora.jpg",
-  "descripcion": "Cazadora corta en tono oscuro. Para entretiempo, encima de vestidos, faldas o con vaqueros."
  },
  {
   "id": "abrigo-marron",
@@ -299,7 +290,7 @@ window.OCCASIO_CATALOGO = [
   "color": "negro",
   "temporada": "todo",
   "foto": "catalogo/bolso-negro.jpg",
-  "descripcion": "Bolso negro de mano, con asa. Elegante y combinable con todo, de día y de noche."
+  "descripcion": "Bolso negro de piel con asa corta. Elegante y combinable con todo, de día y de noche."
  },
  {
   "id": "bolso-marron",
@@ -330,12 +321,12 @@ window.OCCASIO_CATALOGO = [
  },
  {
   "id": "bufanda",
-  "nombre": "Bufanda de cuadros",
+  "nombre": "Bufanda de punto",
   "tipo": "accesorio",
-  "color": "marron",
+  "color": "crema",
   "temporada": "invierno",
   "foto": "catalogo/bufanda.jpg",
-  "descripcion": "Bufanda de cuadros en tonos marrones. Abriga y da un toque de color a los abrigos de invierno."
+  "descripcion": "Bufanda de punto suave en tono claro. Abriga y combina con cualquier abrigo de invierno."
  },
  {
   "id": "cinturon",

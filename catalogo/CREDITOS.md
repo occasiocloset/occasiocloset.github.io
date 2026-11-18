@@ -4,27 +4,26 @@ Todas proceden de Pexels y se usan con su licencia (https://www.pexels.com/licen
 
 - Camiseta blanca: https://www.pexels.com/photo/12039633/
 - Camiseta negra: https://www.pexels.com/photo/8532616/
-- Camisa de rayas: https://www.pexels.com/photo/7444126/
-- Camisa blanca: https://www.pexels.com/photo/28576622/
-- Camisa gris: https://www.pexels.com/photo/13381986/
+- Camisa de rayas: https://www.pexels.com/photo/40443038/
+- Camisa blanca: https://www.pexels.com/photo/14459666/
+- Camisa azul: https://www.pexels.com/photo/9558723/
 - Jersey de rayas marinero: https://www.pexels.com/photo/45982/
-- Jersey de punto crema: https://www.pexels.com/photo/13889763/
+- Jersey de punto crema: https://www.pexels.com/photo/13918752/
 - Cárdigan rojo: https://www.pexels.com/photo/36129313/
-- Jersey de punto rojo: https://www.pexels.com/photo/12944791/
-- Blusa blanca: https://www.pexels.com/photo/17305436/
-- Top blanco de tirantes: https://www.pexels.com/photo/1107604/
+- Jersey negro: https://www.pexels.com/photo/6046230/
+- Blusa blanca: https://www.pexels.com/photo/23495731/
+- Top negro de tirantes: https://www.pexels.com/photo/22441276/
 - Sudadera beige: https://www.pexels.com/photo/6786666/
-- Vaqueros azules: https://www.pexels.com/photo/4109797/
-- Falda de punto beige: https://www.pexels.com/photo/12956068/
-- Pantalón negro de piel: https://www.pexels.com/photo/37736489/
+- Vaqueros azules: https://www.pexels.com/photo/1082528/
+- Falda negra: https://www.pexels.com/photo/6044015/
+- Pantalón negro ancho: https://www.pexels.com/photo/39457561/
 - Vestido negro: https://www.pexels.com/photo/19895958/
 - Vestido de flores: https://www.pexels.com/photo/31683080/
 - Vestido lencero rosa: https://www.pexels.com/photo/36213224/
 - Blazer negra: https://www.pexels.com/photo/35564328/
-- Blazer blanca: https://www.pexels.com/photo/30455413/
+- Blazer beige: https://www.pexels.com/photo/32427323/
 - Gabardina beige: https://www.pexels.com/photo/5418892/
-- Chaqueta vaquera: https://www.pexels.com/photo/13662420/
-- Cazadora oscura: https://www.pexels.com/photo/16906744/
+- Chaqueta vaquera: https://www.pexels.com/photo/8386639/
 - Abrigo marrón: https://www.pexels.com/photo/8112996/
 - Zapatillas blancas: https://www.pexels.com/photo/4296075/
 - Botines negros: https://www.pexels.com/photo/32498579/
@@ -34,10 +33,10 @@ Todas proceden de Pexels y se usan con su licencia (https://www.pexels.com/licen
 - Botas altas marrones: https://www.pexels.com/photo/27596492/
 - Salones negros: https://www.pexels.com/photo/27204296/
 - Bailarinas camel: https://www.pexels.com/photo/37853534/
-- Bolso negro: https://www.pexels.com/photo/12428373/
+- Bolso negro: https://www.pexels.com/photo/36125059/
 - Bolso marrón: https://www.pexels.com/photo/27174573/
 - Bolso tote negro: https://www.pexels.com/photo/1214212/
 - Gafas de sol: https://www.pexels.com/photo/14090246/
-- Bufanda de cuadros: https://www.pexels.com/photo/5603205/
+- Bufanda de punto: https://www.pexels.com/photo/5475167/
 - Cinturón de piel: https://www.pexels.com/photo/31367059/
 - Aros dorados: https://www.pexels.com/photo/12145309/
